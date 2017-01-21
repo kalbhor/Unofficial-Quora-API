@@ -6,6 +6,8 @@ class ScrapeQuora:
 
     def __init__(self, username):
         self.username = username
+        self.feed_count = self.count()
+        self.links = self.links()
 
     def feed_soup(self):
         """
@@ -55,9 +57,11 @@ class ScrapeQuora:
 
         return links
 
+
     def count(self):
         """
-        Returns user data.
+        Returns count of :
+        answers, questions, posts, followers,etc
 
         (div soup) -> dict(user data)
         """
@@ -89,24 +93,31 @@ class ScrapeQuora:
         (div soup) -> list(questions), list(questions_links) 
         """
 
-        links = self.links()
-        url = links['questions']
+        #links = self.links()
+        url = self.links['questions']
 
         response = requests.get(url)
         soup = BeautifulSoup(response.text, 'html.parser')
         div_questions = soup.find_all('span',{'class' : 'question_text'})
         div_links = soup.find_all('a', {'class' : 'question_link'})
 
-        questions = []
+        recent_questions = []
         questions_links = []
 
         for question in div_questions:
-            questions.append(question.get_text())
+            recent_questions.append(question.get_text())
 
         for link in div_links:
             questions_links.append("https://www.quora.com" + link.get('href'))
 
-        return questions, questions_links
+        questions = {
+        'page' : url,
+        'count' : self.feed_count['questions'],
+        'recent' : recent_questions,
+        'urls' : questions_links,
+        }
+
+        return questions
 
 
     def posts(self):
@@ -115,8 +126,8 @@ class ScrapeQuora:
 
         (div soup) -> list(questions), list(questions_links)
         """
-        links = self.links()
-        url = links['answers']
+        #links = self.links()
+        url = self.links['answers']
 
         response = requests.get(url)
         soup = BeautifulSoup(response.text, 'html.parser')
@@ -125,17 +136,25 @@ class ScrapeQuora:
         a_links = soup.find_all('a', {'class' : 'BoardItemTitle'})
         span_upvotes = soup.find_all('div', {'class' : 'Answer ActionBar'}) ####
 
-        posts = []
+        recent_posts = []
         posts_links = []
         post_upvotes = []
 
         for i in range(1,len(div_posts)):
-            posts.append(div_posts[i].get_text())
+            recent_posts.append(div_posts[i].get_text())
 
         for link in a_links:
             posts_links.append("https://www.quora.com" + link.get('href'))
 
-        return posts, posts_links, post_upvotes
+        posts = {
+        'page' : url,
+        'count' : self.feed_count['posts'],
+        'recent' : recent_posts,
+        'urls' : posts_links,
+        'upvotes': post_upvotes, ## Find a way to get upvotes
+        }
+
+        return posts
 
 
 
@@ -145,8 +164,8 @@ class ScrapeQuora:
 
         (div soup) -> list(questions), list(questions_links)
         """
-        links = self.links()
-        url = links['answers']
+        #links = self.links()
+        url = self.links['answers']
 
         response = requests.get(url)
         soup = BeautifulSoup(response.text, 'html.parser')
@@ -155,60 +174,48 @@ class ScrapeQuora:
         a_links = soup.find_all('a', {'class' : 'question_link'})
         span_upvotes = soup.find_all('div', {'class' : 'Answer ActionBar'}) ####
 
-        answers = []
+        recent_answers = []
         answers_links = []
         answer_upvotes = []
 
         for question in div_questions:
-            answers.append(question.get_text())
+            recent_answers.append(question.get_text())
 
         for link in a_links:
             answers_links.append("https://www.quora.com" + link.get('href'))
 
-        return answers, answers_links, answer_upvotes
+
+        answers = {
+        'page' : url,
+        'count' : self.feed_count['answers'],
+        'recent' : recent_answers,
+        'urls' : answers_links,
+        'upvotes': answer_upvotes, ## Find a way to get upvotes
+        }
+
+        return answers
+
+
+    def followers(self):
+
+        followers = {
+        'link' : self.links['followers'],
+        'count' : self.feed_count['followers']
+        }
+
+        return followers
+
+    def following(self):
+
+        following = {
+        'link' : self.links['following'],
+        'count' : self.feed_count['following']
+        }
+
+        return following
 
 
 if __name__ == '__main__':
+    user = ScrapeQuora('Lakshay-Kalbhor')
+    print(user.count())
 
-    user = ScrapeQuora('User')
-    links = user.links()
-    recent_questions, questions_links = user.questions()
-    recent_answers, answers_links, answer_upvotes = user.answers()
-    recent_posts, posts_links, post_upvotes = user.posts()
-    feed_count = user.count()
-
-
-    questions = {
-    'link' : links['questions'],
-    'count' : feed_count['questions'],
-    'recent' : recent_questions,
-    'recentlinks' : questions_links,
-    }
-
-    answers = {
-    'link' : links['answers'],
-    'count' : feed_count['answers'],
-    'recent' : recent_answers,
-    'recentlinks' : answers_links,
-    'upvotes': answers_upvotes, ## Find a way to get upvotes
-    }
-
-    followers = {
-    'link' : links['followers'],
-    'count' : feed_count['followers']
-    }
-
-    following = {
-    'link' : links['following'],
-    'count' : feed_count['following']
-    }
-
-    posts = {
-    'link' : links['posts'],
-    'count' : feed_count['posts'],
-    'recent' : recent_posts, ## Needs to be looked upon
-    'recentlinks' : posts_links, ## Direct consequence of recent_posts
-    'upvotes' : posts_upvotes, ## Find a way to get upvotes 
-    }
-
-    pprint.pprint(posts)
