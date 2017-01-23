@@ -2,7 +2,9 @@
 
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg?style=flat-square)](LICENSE)
 
-> An Unofficial REST API for [Quora](https://quora.com) 
+> An Unofficial REST API for [Quora](https://quora.com)
+
+This is an attempt to revamp an [older](https://github.com/csu/quora-api) version of the unofficial API originally built by [Christopher](https://github.com/csu). 
 
 ## Table of Contents
 
