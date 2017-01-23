@@ -2,7 +2,7 @@
 
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg?style=flat-square)](LICENSE)
 
-> An Unofficial REST api for [Quora](https://quora.com) 
+> An Unofficial REST API for [Quora](https://quora.com) 
 
 ## Table of Contents
 
@@ -25,7 +25,7 @@
 ```sh
 $ git clone https://github.com/lakshaykalbhor/Unofficial-Quora-API
 $ cd Unofficial-Quora-API
-$ python setup.py install
+$ pip install -r requirements.txt 
 ```
 
 ## Usage
