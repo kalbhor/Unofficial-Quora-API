@@ -23,7 +23,7 @@ class ScrapeQuora:
         (div soup) -> dict(links)
         """
 
-        url = "https://www.quora.com/profile/%s" % (username)
+        url = "https://www.quora.com/profile/{}".format(username)
         response = requests.get(url)
 
         soup = BeautifulSoup(response.text, 'html.parser')
@@ -32,7 +32,7 @@ class ScrapeQuora:
         url_list = []
 
         for url in div.find_all('a'):
-            url_list.append("https://www.quora.com" + url.get('href'))
+            url_list.append("https://www.quora.com{}".format(url.get('href')))
 
         links = {
             'answers': url_list[0],
@@ -57,7 +57,7 @@ class ScrapeQuora:
         (div soup) -> dict(user data)
         """
 
-        url = "https://www.quora.com/profile/%s" % (username)
+        url = "https://www.quora.com/profile/{}".format(username)
         response = requests.get(url)
 
         soup = BeautifulSoup(response.text, 'html.parser')
@@ -105,7 +105,7 @@ class ScrapeQuora:
             recent_questions.append(question.get_text())
 
         for link in div_links:
-            questions_links.append("https://www.quora.com" + link.get('href'))
+            questions_links.append("https://www.quora.com{}".format(link.get('href')))
 
         questions = {
             'page': url,
@@ -180,7 +180,7 @@ class ScrapeQuora:
             recent_answers.append(question.get_text())
 
         for link in a_links:
-            answers_links.append("https://www.quora.com" + link.get('href'))
+            answers_links.append("https://www.quora.com{}/answer/{}" .format(link.get('href'), self.username))
 
         answers = {
             'page': url,
