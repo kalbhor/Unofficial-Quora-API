@@ -1,6 +1,7 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify
+from flask.ext.cache import Cache
+
 from Quora import ScrapeQuora
-from flask.ext.cache import Cache 
 
 app = Flask(__name__)
 app.config['CACHE_TYPE'] = 'simple'
@@ -23,24 +24,26 @@ def index():
             'user_questions': '/{user}/questions',
             'user_answers': '/{user}/answers',
             'user_posts': '/{user}/posts',
-            ## 'question': '/questions/{question}', (Add these option later)
-            ## 'answer': '/answers/{answer}', (Add this option later)
+            #TODO: 'question': '/questions/{question}', (Add these option later)
+            #TODO: 'answer': '/answers/{answer}', (Add this option later)
         }
     })
+
 
 ### User profile info ###
 @app.route('/<user>', methods=['GET'])
 @app.cache.cached(timeout=300)
 def user_info(user):
-	count = ScrapeQuora.count(user)
-	links = ScrapeQuora.links(user)
+    count = ScrapeQuora.count(user)
+    links = ScrapeQuora.links(user)
 
-	response = {
-	'count' : count,
-	'url' : links,
-	}
+    response = {
+        'count': count,
+        'url': links,
+    }
 
-	return jsonify(response)
+    return jsonify(response)
+
 
 ### User followers info ###
 @app.route('/<user>/followers', methods=['GET'])
@@ -48,11 +51,13 @@ def user_info(user):
 def user_followers(user):
     return jsonify(ScrapeQuora(user).followers())
 
+
 ### User following info ###
 @app.route('/<user>/following', methods=['GET'])
 @app.cache.cached(timeout=240)
 def user_following(user):
     return jsonify(ScrapeQuora(user).following())
+
 
 ### Recent questions asked by user ###
 @app.route('/<user>/questions', methods=['GET'])
@@ -60,11 +65,13 @@ def user_following(user):
 def user_questions(user):
     return jsonify(ScrapeQuora(user).questions())
 
+
 ### Recent answers by user ###
 @app.route('/<user>/answers', methods=['GET'])
 @app.cache.cached(timeout=300)
 def user_answers(user):
     return jsonify(ScrapeQuora(user).answers())
+
 
 ### Recent blog posts by user ###
 @app.route('/<user>/posts', methods=['GET'])
@@ -72,6 +79,6 @@ def user_answers(user):
 def user_posts(user):
     return jsonify(ScrapeQuora(user).posts())
 
+
 if __name__ == '__main__':
     app.run(debug=True)
-
